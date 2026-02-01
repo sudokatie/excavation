@@ -9,10 +9,10 @@ export class Level {
   constructor(def: LevelDef) {
     this.width = def.width;
     this.height = def.height;
-    this.grid = this.parseGrid(def.grid, def.playerStart, def.exitPos);
+    this.grid = this.parseGrid(def.grid);
   }
 
-  private parseGrid(gridString: string, _playerStart: Position, _exitPos: Position): Tile[][] {
+  private parseGrid(gridString: string): Tile[][] {
     const rows = gridString.split('\n');
     const grid: Tile[][] = [];
 

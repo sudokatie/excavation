@@ -39,11 +39,6 @@ export class Level {
       grid.push(row);
     }
 
-    // Ensure exit is set
-    if (grid[exitPos.y] && grid[exitPos.y][exitPos.x]) {
-      grid[exitPos.y][exitPos.x] = { type: 'exit', falling: false };
-    }
-
     return grid;
   }
 

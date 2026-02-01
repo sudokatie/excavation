@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Excavation
 
-## Getting Started
+A browser-based Boulder Dash style puzzle game. Dig for gems, avoid falling rocks, and don't get crushed.
 
-First, run the development server:
+## Play
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How to Play
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+You're a miner in a cave full of dirt, gems, and boulders.
 
-## Learn More
+- **Dig** through dirt to create paths
+- **Collect gems** to unlock the exit
+- **Watch out** for falling boulders - they'll crush you!
+- **Push boulders** horizontally to clear paths or trigger chain reactions
 
-To learn more about Next.js, take a look at the following resources:
+## Controls
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Key | Action |
+|-----|--------|
+| Arrow Keys / WASD | Move and dig |
+| Ctrl + Direction | Dig without moving |
+| P | Pause |
+| R | Restart level |
+| ESC | Return to menu |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Physics
 
-## Deploy on Vercel
+- Boulders and gems fall when unsupported
+- Objects roll off rounded surfaces (other boulders, gems, walls)
+- Chain reactions can cascade through the level
+- Getting crushed by a falling object = game over
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Levels
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Tutorial: Digging** - Learn to dig and collect gems
+2. **Tutorial: Boulders** - Introduction to falling rocks
+3. **Cave 1: Timing** - Multiple boulders require careful timing
+4. **Cave 2: Rolling** - Master the rolling mechanics
+5. **Cave 3: Cascade** - Chain reactions and complex puzzles
+
+## Tech Stack
+
+- Next.js 14 with App Router
+- TypeScript
+- HTML5 Canvas
+- Tailwind CSS
+
+## Development
+
+```bash
+npm test        # Run tests
+npm run lint    # Check for issues
+npm run build   # Production build
+```
+
+## Credits
+
+Inspired by Boulder Dash (1984) by Peter Liepa and Chris Gray.
+
+## License
+
+MIT

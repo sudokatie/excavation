@@ -12,7 +12,7 @@ export class Level {
     this.grid = this.parseGrid(def.grid, def.playerStart, def.exitPos);
   }
 
-  private parseGrid(gridString: string, playerStart: Position, exitPos: Position): Tile[][] {
+  private parseGrid(gridString: string, _playerStart: Position, _exitPos: Position): Tile[][] {
     const rows = gridString.split('\n');
     const grid: Tile[][] = [];
 

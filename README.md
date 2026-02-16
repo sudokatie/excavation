@@ -21,6 +21,7 @@ You're a miner in a cave full of dirt, gems, and boulders.
 - **Push boulders** horizontally to clear paths or trigger chain reactions
 - **Listen** to retro sound effects (synthesized via Web Audio API)
 - **Compete** on the local high score leaderboard
+- **8 levels** of increasing difficulty
 
 ## Controls
 

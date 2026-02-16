@@ -19,6 +19,7 @@ You're a miner in a cave full of dirt, gems, and boulders.
 - **Collect gems** to unlock the exit
 - **Watch out** for falling boulders - they'll crush you!
 - **Push boulders** horizontally to clear paths or trigger chain reactions
+- **Listen** to retro sound effects (synthesized via Web Audio API)
 
 ## Controls
 

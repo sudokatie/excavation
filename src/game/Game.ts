@@ -4,6 +4,7 @@ import { Player } from './Player';
 import { LEVELS } from './levels';
 import { SCORING } from './constants';
 import { Direction, GameState, QueuedInput } from './types';
+import { Sound } from './Sound';
 
 export class Game {
   state: GameState;
@@ -50,6 +51,7 @@ export class Game {
     if (this.physics.isDangerous(this.player.x, this.player.y)) {
       this.player.die();
       this.state.status = 'dead';
+      Sound.play('crush');
       return;
     }
 
@@ -60,6 +62,7 @@ export class Game {
     if (this.isPlayerAtExit() && this.state.exitOpen) {
       this.state.status = 'won';
       this.state.score = this.calculateScore();
+      Sound.play('levelComplete');
     }
 
     // Sync player position
@@ -74,6 +77,14 @@ export class Game {
     if (result.collected === 'gem') {
       this.state.gemsCollected++;
       this.state.score += SCORING.GEM;
+      Sound.play('collect');
+    }
+    if (result.moved) {
+      if (result.dugDirt) {
+        Sound.play('dig');
+      } else {
+        Sound.play('move');
+      }
     }
     this.state.player = { x: this.player.x, y: this.player.y };
   }
@@ -86,6 +97,7 @@ export class Game {
     
     if (this.state.timeRemaining <= 0) {
       this.state.status = 'dead';
+      Sound.play('death');
     }
   }
 
@@ -140,5 +152,15 @@ export class Game {
       score: 0,
       exitOpen: false,
     };
+  }
+
+  toggleSound(): boolean {
+    const newState = !Sound.isEnabled();
+    Sound.setEnabled(newState);
+    return newState;
+  }
+
+  isSoundEnabled(): boolean {
+    return Sound.isEnabled();
   }
 }

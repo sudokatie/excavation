@@ -20,6 +20,7 @@ You're a miner in a cave full of dirt, gems, and boulders.
 - **Watch out** for falling boulders - they'll crush you!
 - **Push boulders** horizontally to clear paths or trigger chain reactions
 - **Listen** to retro sound effects (synthesized via Web Audio API)
+- **Background music** with underground, digging-themed chiptune
 - **Compete** on the local high score leaderboard
 - **8 levels** of increasing difficulty
 

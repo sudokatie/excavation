@@ -26,6 +26,7 @@ You're a miner in a cave full of dirt, gems, and boulders.
 
 ## Controls
 
+### Keyboard
 | Key | Action |
 |-----|--------|
 | Arrow Keys / WASD | Move and dig |
@@ -33,6 +34,11 @@ You're a miner in a cave full of dirt, gems, and boulders.
 | P | Pause |
 | R | Restart level |
 | ESC | Return to menu |
+
+### Mobile / Touch
+| Gesture | Action |
+|---------|--------|
+| Swipe | Move and dig |
 
 ## Physics
 

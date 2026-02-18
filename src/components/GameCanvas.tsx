@@ -6,6 +6,9 @@ import { Renderer } from '@/game/Renderer';
 import { CANVAS, TIMING } from '@/game/constants';
 import { Direction } from '@/game/types';
 
+// Minimum swipe distance in pixels
+const SWIPE_THRESHOLD = 30;
+
 interface Props {
   levelIndex: number;
   onWin: () => void;
@@ -19,6 +22,9 @@ export default function GameCanvas({ levelIndex, onWin, onDeath, onQuit }: Props
   const rendererRef = useRef<Renderer | null>(null);
   const lastTickRef = useRef(0);
   const lastTimeRef = useRef(0);
+  
+  // Touch tracking
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const game = gameRef.current;
@@ -71,6 +77,42 @@ export default function GameCanvas({ levelIndex, onWin, onDeath, onQuit }: Props
     }
   }, [onQuit]);
 
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    e.preventDefault();
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    const game = gameRef.current;
+    if (!game || !touchStartRef.current) return;
+    if (e.changedTouches.length !== 1) return;
+    
+    e.preventDefault();
+    
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    let direction: Direction | null = null;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (deltaX > SWIPE_THRESHOLD) direction = 'right';
+      else if (deltaX < -SWIPE_THRESHOLD) direction = 'left';
+    } else {
+      // Vertical swipe
+      if (deltaY > SWIPE_THRESHOLD) direction = 'down';
+      else if (deltaY < -SWIPE_THRESHOLD) direction = 'up';
+    }
+
+    if (direction) {
+      game.queueInput(direction, false);
+    }
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -84,6 +126,8 @@ export default function GameCanvas({ levelIndex, onWin, onDeath, onQuit }: Props
     lastTimeRef.current = 0;
 
     window.addEventListener('keydown', handleKeyDown);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     let animId: number;
 
@@ -121,8 +165,10 @@ export default function GameCanvas({ levelIndex, onWin, onDeath, onQuit }: Props
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('keydown', handleKeyDown);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [levelIndex, onWin, onDeath, handleKeyDown]);
+  }, [levelIndex, onWin, onDeath, handleKeyDown, handleTouchStart, handleTouchEnd]);
 
   return (
     <canvas

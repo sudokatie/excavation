@@ -7,6 +7,7 @@ import LevelSelect from '@/components/LevelSelect';
 import GameOver from '@/components/GameOver';
 import { Game } from '@/game/Game';
 import { LEVELS } from '@/game/levels';
+import { Music } from '@/game/Music';
 
 type Screen = 'menu' | 'playing' | 'gameover';
 
@@ -58,6 +59,21 @@ export default function Home() {
       startLevel(levelIndex + 1);
     }
   }, [levelIndex, startLevel]);
+
+  // Switch music tracks based on screen state
+  useEffect(() => {
+    switch (screen) {
+      case 'menu':
+        Music.play('menu');
+        break;
+      case 'playing':
+        Music.play('gameplay');
+        break;
+      case 'gameover':
+        Music.play(won ? 'victory' : 'gameover');
+        break;
+    }
+  }, [screen, won]);
 
   // Update HUD from game state
   useEffect(() => {

@@ -32,7 +32,8 @@ class SoundSystem {
 
     if (!this.context) {
       try {
-        this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.context = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       } catch {
         return null;
       }

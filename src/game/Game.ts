@@ -5,6 +5,7 @@ import { LEVELS } from './levels';
 import { SCORING } from './constants';
 import { Direction, GameState, QueuedInput } from './types';
 import { Sound } from './Sound';
+import { getDailyLevelIds, DailyLeaderboard, todayString, generateShareCode } from './Daily';
 
 export class Game {
   state: GameState;
@@ -12,6 +13,21 @@ export class Game {
   physics: Physics;
   player: Player;
   inputQueue: QueuedInput[] = [];
+
+  // Daily challenge state
+  private dailyMode: boolean = false;
+  private dailyLevels: number[] = [];
+  private dailyLevelIndex: number = 0;
+  private dailyTotalGems: number = 0;
+  private dailyStartTime: number = 0;
+
+  // Callbacks
+  onDailyComplete?: (result: {
+    totalGems: number;
+    levelsCompleted: number;
+    timeSeconds: number;
+    shareCode: string;
+  }) => void;
 
   constructor(levelIndex: number) {
     const def = LEVELS[levelIndex];
@@ -30,6 +46,7 @@ export class Game {
       timeRemaining: def.timeLimit,
       score: 0,
       exitOpen: false,
+      dailyMode: this.dailyMode,
     };
   }
 
@@ -151,7 +168,110 @@ export class Game {
       timeRemaining: def.timeLimit,
       score: 0,
       exitOpen: false,
+      dailyMode: this.dailyMode,
     };
+  }
+
+  /** Load a specific level */
+  loadLevel(levelIndex: number): void {
+    const def = LEVELS[levelIndex];
+    this.level = new Level(def);
+    this.physics = new Physics(this.level);
+    this.player = new Player(def.playerStart.x, def.playerStart.y);
+    this.inputQueue = [];
+    
+    this.state = {
+      status: 'playing',
+      level: levelIndex,
+      grid: this.level.grid,
+      player: { ...def.playerStart },
+      exit: { ...def.exitPos },
+      gemsCollected: 0,
+      gemsRequired: def.gemsRequired,
+      timeRemaining: def.timeLimit,
+      score: 0,
+      exitOpen: false,
+      dailyMode: this.dailyMode,
+    };
+  }
+
+  /** Start a daily challenge */
+  startDaily(): void {
+    this.dailyMode = true;
+    this.dailyLevels = getDailyLevelIds(LEVELS.length);
+    this.dailyLevelIndex = 0;
+    this.dailyTotalGems = 0;
+    this.dailyStartTime = Date.now();
+    
+    this.loadLevel(this.dailyLevels[0]);
+  }
+
+  /** Advance to next daily level or complete */
+  nextDailyLevel(): void {
+    if (!this.dailyMode) return;
+    
+    this.dailyTotalGems += this.state.gemsCollected;
+    this.dailyLevelIndex++;
+    
+    if (this.dailyLevelIndex < this.dailyLevels.length) {
+      this.loadLevel(this.dailyLevels[this.dailyLevelIndex]);
+    } else {
+      // Daily complete
+      const timeSeconds = Math.floor((Date.now() - this.dailyStartTime) / 1000);
+      const shareCode = generateShareCode(todayString(), this.dailyTotalGems, this.dailyLevels.length);
+      
+      this.onDailyComplete?.({
+        totalGems: this.dailyTotalGems,
+        levelsCompleted: this.dailyLevels.length,
+        timeSeconds,
+        shareCode,
+      });
+    }
+  }
+
+  /** Exit daily mode */
+  exitDaily(): void {
+    this.dailyMode = false;
+    this.dailyLevels = [];
+    this.dailyLevelIndex = 0;
+    this.dailyTotalGems = 0;
+  }
+
+  /** Submit daily score */
+  submitDailyScore(name: string): number | null {
+    const timeSeconds = Math.floor((Date.now() - this.dailyStartTime) / 1000);
+    return DailyLeaderboard.recordScore(
+      name,
+      this.dailyTotalGems,
+      this.dailyLevels.length,
+      timeSeconds
+    );
+  }
+
+  /** Check if in daily mode */
+  isDailyMode(): boolean {
+    return this.dailyMode;
+  }
+
+  /** Get daily progress */
+  getDailyProgress(): { current: number; total: number; totalGems: number } {
+    return {
+      current: this.dailyLevelIndex + 1,
+      total: this.dailyLevels.length,
+      totalGems: this.dailyTotalGems + this.state.gemsCollected,
+    };
+  }
+
+  /** Get state with daily progress */
+  getState(): GameState {
+    const state = { ...this.state };
+    state.dailyMode = this.dailyMode;
+    
+    if (this.dailyMode) {
+      state.dailyProgress = this.getDailyProgress();
+    }
+    
+    return state;
   }
 
   toggleSound(): boolean {

@@ -43,6 +43,13 @@ export interface GameState {
   timeRemaining: number;
   score: number;
   exitOpen: boolean;
+  // Daily challenge
+  dailyMode: boolean;
+  dailyProgress?: {
+    current: number;
+    total: number;
+    totalGems: number;
+  };
 }
 
 // Input queue entry

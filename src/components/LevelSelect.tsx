@@ -4,13 +4,16 @@ import { useState } from 'react';
 import { LEVELS } from '@/game/levels';
 import { Music } from '@/game/Music';
 import { Sound } from '@/game/Sound';
+import { DailyLeaderboard } from '@/game/Daily';
 
 interface Props {
   onSelect: (levelIndex: number) => void;
+  onStartDaily: () => void;
   highestUnlocked: number;
 }
 
-export default function LevelSelect({ onSelect, highestUnlocked }: Props) {
+export default function LevelSelect({ onSelect, onStartDaily, highestUnlocked }: Props) {
+  const dailyBest = DailyLeaderboard.getBest();
   const [musicVolume, setMusicVolume] = useState(Music.getVolume());
   const [soundVolume, setSoundVolume] = useState(Sound.getVolume());
   const [musicEnabled, setMusicEnabled] = useState(Music.isEnabled());
@@ -45,6 +48,19 @@ export default function LevelSelect({ onSelect, highestUnlocked }: Props) {
       <h1 className="text-4xl font-bold text-cyan-400">EXCAVATION</h1>
       <p className="text-gray-400">Dig for gems. Avoid falling rocks.</p>
       
+      {/* Daily Challenge Button */}
+      <button
+        onClick={onStartDaily}
+        className="w-full max-w-md py-4 px-6 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 rounded-lg text-white font-bold transition-all"
+      >
+        <div className="text-xl">DAILY CHALLENGE</div>
+        <div className="text-sm opacity-80">
+          {dailyBest
+            ? `Best: ${dailyBest.totalGems} gems (${dailyBest.levelsCompleted} levels)`
+            : '3 random levels - collect the most gems!'}
+        </div>
+      </button>
+
       <div className="grid grid-cols-3 gap-4 mt-4">
         {LEVELS.map((level, index) => {
           const locked = index > highestUnlocked;

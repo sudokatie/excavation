@@ -5,6 +5,7 @@ import GameCanvas from '@/components/GameCanvas';
 import HUD from '@/components/HUD';
 import LevelSelect from '@/components/LevelSelect';
 import GameOver from '@/components/GameOver';
+import { DailyComplete } from '@/components/DailyComplete';
 import { Game } from '@/game/Game';
 import { LEVELS } from '@/game/levels';
 import { Music } from '@/game/Music';
@@ -17,6 +18,11 @@ export default function Home() {
   const [won, setWon] = useState(false);
   const [highestUnlocked, setHighestUnlocked] = useState(LEVELS.length - 1); // All unlocked for now
   const gameRef = useRef<Game | null>(null);
+  const [dailyResult, setDailyResult] = useState<{
+    totalGems: number;
+    levelsCompleted: number;
+    timeSeconds: number;
+  } | null>(null);
   const [hudState, setHudState] = useState({
     levelName: '',
     gems: 0,
@@ -60,6 +66,36 @@ export default function Home() {
     }
   }, [levelIndex, startLevel]);
 
+  const handleStartDaily = useCallback(() => {
+    const game = new Game(0);
+    game.onDailyComplete = (result) => {
+      setDailyResult({
+        totalGems: result.totalGems,
+        levelsCompleted: result.levelsCompleted,
+        timeSeconds: result.timeSeconds,
+      });
+    };
+    game.startDaily();
+    gameRef.current = game;
+    setScreen('playing');
+  }, []);
+
+  const handleNextDaily = useCallback(() => {
+    const game = gameRef.current;
+    if (game && game.isDailyMode()) {
+      game.nextDailyLevel();
+      setScreen('playing');
+    }
+  }, []);
+
+  const handleDailyClose = useCallback(() => {
+    setDailyResult(null);
+    if (gameRef.current) {
+      gameRef.current.exitDaily();
+    }
+    setScreen('menu');
+  }, []);
+
   // Switch music tracks based on screen state
   useEffect(() => {
     switch (screen) {
@@ -99,7 +135,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
       {screen === 'menu' && (
-        <LevelSelect onSelect={startLevel} highestUnlocked={highestUnlocked} />
+        <LevelSelect onSelect={startLevel} onStartDaily={handleStartDaily} highestUnlocked={highestUnlocked} />
       )}
       
       {screen === 'playing' && (
@@ -133,9 +169,22 @@ export default function Home() {
               onNextLevel={handleNextLevel}
               onMenu={handleQuit}
               hasNextLevel={levelIndex + 1 < LEVELS.length}
+              dailyMode={gameRef.current.isDailyMode()}
+              dailyProgress={gameRef.current.getDailyProgress()}
+              onNextDaily={handleNextDaily}
             />
           </div>
         </div>
+      )}
+
+      {dailyResult && (
+        <DailyComplete
+          totalGems={dailyResult.totalGems}
+          levelsCompleted={dailyResult.levelsCompleted}
+          timeSeconds={dailyResult.timeSeconds}
+          onSubmit={() => {}}
+          onClose={handleDailyClose}
+        />
       )}
     </main>
   );

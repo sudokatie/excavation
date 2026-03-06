@@ -7,6 +7,13 @@ interface Props {
   onNextLevel: () => void;
   onMenu: () => void;
   hasNextLevel: boolean;
+  dailyMode?: boolean;
+  dailyProgress?: {
+    current: number;
+    total: number;
+    totalGems: number;
+  };
+  onNextDaily?: () => void;
 }
 
 export default function GameOver({
@@ -18,6 +25,9 @@ export default function GameOver({
   onNextLevel,
   onMenu,
   hasNextLevel,
+  dailyMode,
+  dailyProgress,
+  onNextDaily,
 }: Props) {
   return (
     <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
@@ -30,33 +40,65 @@ export default function GameOver({
           <p className="text-2xl text-cyan-400">Score: {score}</p>
           <p className="text-gray-400">
             Gems: {gemsCollected}/{totalGems}
-            {gemsCollected >= totalGems && ' ⭐ Perfect!'}
+            {gemsCollected >= totalGems && ' Perfect!'}
           </p>
+          
+          {dailyMode && dailyProgress && (
+            <div className="mt-2 p-2 bg-gray-700 rounded">
+              <p className="text-yellow-400">
+                Daily {dailyProgress.current}/{dailyProgress.total}
+              </p>
+              <p className="text-gray-400 text-sm">
+                Total Gems: {dailyProgress.totalGems}
+              </p>
+            </div>
+          )}
         </div>
         
         <div className="flex gap-4 justify-center">
-          <button
-            onClick={onRestart}
-            className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
-          >
-            Retry
-          </button>
-          
-          {won && hasNextLevel && (
-            <button
-              onClick={onNextLevel}
-              className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors"
-            >
-              Next Level
-            </button>
+          {dailyMode && onNextDaily ? (
+            <>
+              <button
+                onClick={onNextDaily}
+                className="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 rounded-lg transition-colors"
+              >
+                {dailyProgress && dailyProgress.current < dailyProgress.total
+                  ? 'Next Level'
+                  : 'Complete Daily'}
+              </button>
+              <button
+                onClick={onMenu}
+                className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
+              >
+                Quit
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onRestart}
+                className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+              
+              {won && hasNextLevel && (
+                <button
+                  onClick={onNextLevel}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors"
+                >
+                  Next Level
+                </button>
+              )}
+              
+              <button
+                onClick={onMenu}
+                className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
+              >
+                Menu
+              </button>
+            </>
           )}
-          
-          <button
-            onClick={onMenu}
-            className="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
-          >
-            Menu
-          </button>
         </div>
       </div>
     </div>
